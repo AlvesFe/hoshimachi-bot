@@ -5,6 +5,9 @@
   "main": "main.js",
   "author": "Felipe Batista Alves",
   "license": "MIT",
+  "engines": {
+    "node": ">=16.6.0"
+  },
   "scripts": {
     "start": "node .",
     "deployCommands": "node deploy-commands.js"
