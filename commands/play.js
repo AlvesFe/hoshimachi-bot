@@ -19,6 +19,7 @@ module.exports = {
 		if (!voiceChannel) {
 			await interaction.reply('Você precisa estar em um canal de voz para executar esse comando');
 		} else {
+			const url = search.all[0].url;
 			const connection = joinVoiceChannel({
 				channelId: voiceChannel.id,
 				guildId: voiceChannel.guild.id,
@@ -28,11 +29,18 @@ module.exports = {
 			const player = createAudioPlayer();
 			connection.subscribe(player);
 
-			const stream = ytdl(search.all[0].url, { filter: 'audioonly' });
+			const stream = ytdl(url, {
+				filter: 'audioonly',
+				format: 'ogg',
+				highWaterMark: 1048576 * 32
+			})
+			.on('error', (e) => {
+				console.error(e);
+			});
+
+
 			const resource = createAudioResource(stream, { seek: 0, volume: 1 });
 			player.play(resource);
-
-			player.on('error', console.error);
 
 			// setTimeout(() => {
 			// 	connection.destroy();
