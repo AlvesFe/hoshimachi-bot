@@ -7,21 +7,21 @@ const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_
 // Commands listing
 client.commands = new Collection();
 const commandFiles = fs
-  .readdirSync('./commands')
+  .readdirSync('./src/commands')
   .filter((file) => file.endsWith('.js'));
 
 for (const file of commandFiles) {
-  const command = require(`./commands/${file}`);
+  const command = require(`./src/commands/${file}`);
   client.commands.set(command.data.name, command);
 }
 
 // Events listing & executing
 const eventFiles = fs
-  .readdirSync('./events')
+  .readdirSync('./src/events')
   .filter((file) => file.endsWith('.js'));
 
 for (const file of eventFiles) {
-  const event = require(`./events/${file}`);
+  const event = require(`./src/events/${file}`);
   if (event.once) {
     client.once(event.name, (...args) => event.execute(...args));
   } else {
