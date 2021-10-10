@@ -9,7 +9,6 @@
 	},
 	"rules": {
 		"arrow-spacing": ["warn", { "before": true, "after": true }],
-		"comma-dangle": ["error", "always-multiline"],
 		"comma-spacing": "error",
 		"comma-style": "error",
 		"dot-location": ["error", "property"],
@@ -34,7 +33,7 @@
 		"space-before-blocks": "error",
 		"space-before-function-paren": ["error", {
 			"anonymous": "never",
-			"named": "never",
+			"named": "always",
 			"asyncArrow": "always"
 		}],
 		"space-in-parens": "error",
