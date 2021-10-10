@@ -11,7 +11,7 @@ module.exports = {
 			option.setName('music')
 				.setDescription('Link ou nome da música')
 				.setRequired(true)),
-	async execute(interaction) {
+	async execute (interaction) {
 		const search = await yts(interaction.options._hoistedOptions[0].value);
 		const user = await interaction.member.fetch();
 		const voiceChannel = await user.voice.channel;
@@ -34,9 +34,9 @@ module.exports = {
 				format: 'ogg',
 				highWaterMark: 1048576 * 32
 			})
-			.on('error', (e) => {
-				console.error(e);
-			});
+				.on('error', (e) => {
+					console.error(e);
+				});
 
 
 			const resource = createAudioResource(stream, { seek: 0, volume: 1 });

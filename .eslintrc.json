@@ -33,7 +33,7 @@
 		"space-before-blocks": "error",
 		"space-before-function-paren": ["error", {
 			"anonymous": "never",
-			"named": "never",
+			"named": "always",
 			"asyncArrow": "always"
 		}],
 		"space-in-parens": "error",
