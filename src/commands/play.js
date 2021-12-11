@@ -1,30 +1,40 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { joinVoiceChannel, createAudioPlayer, createAudioResource } = require('@discordjs/voice');
+const { joinVoiceChannel, createAudioPlayer, createAudioResource, AudioPlayerStatus } = require('@discordjs/voice');
 const yts = require('yt-search');
 const ytdl = require('ytdl-core');
+const { queue, channel } = require('../resources');
+const player = createAudioPlayer();
+
+player.on(AudioPlayerStatus.Idle, async () => {
+	queue.shift();
+	if (queue.length > 0) {
+		playMusic(queue[0]);
+		await channel.interaction.followUp(`Tocando: ${queue[0].title}\n Autor: ${queue[0].author.name}`);
+	}
+});
 
 function isVideo (search) {
 	return search.type === 'video';
 }
 
-async function playMusic (voiceChannel, interaction, url) {
+function JoinChannel (interaction, voiceChannel) {
 	const connection = joinVoiceChannel({
 		channelId: voiceChannel.id,
 		guildId: voiceChannel.guild.id,
 		adapterCreator: interaction.member.guild.voiceAdapterCreator
 	});
-
-	const player = createAudioPlayer();
+	channel.interaction = interaction;
 	connection.subscribe(player);
+}
 
-	const stream = ytdl(url, {
+async function playMusic (search) {
+	const stream = ytdl(search.url, {
 		filter: 'audioonly',
 		format: 'ogg',
 		highWaterMark: 1048576 * 32
-	})
-		.on('error', (e) => {
-			console.error(e);
-		});
+	}).on('error', (e) => {
+		console.error(e);
+	});
 
 	const resource = createAudioResource(stream, { seek: 0, volume: 1 });
 	player.play(resource);
@@ -48,9 +58,15 @@ module.exports = {
 			return await interaction.reply('Você precisa estar em um canal de voz para executar esse comando');
 		}
 
-		if (isVideo(search)) {
-			await playMusic(voiceChannel, interaction, search.url);
+		JoinChannel(interaction, voiceChannel);
+
+		if (isVideo(search) && queue.length === 0) {
+			queue.push(search);
+			await playMusic(search);
 			await interaction.reply(`Tocando: ${search.title}\n Autor: ${search.author.name}`);
+		} else if (isVideo(search) && queue.length !== 0) {
+			queue.push(search);
+			await interaction.reply(`Música ${queue[queue.length - 1].title} adicionada a fila`);
 		} else {
 			await interaction.reply('Música não encontrada');
 		}

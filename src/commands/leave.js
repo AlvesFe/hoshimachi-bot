@@ -1,5 +1,6 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { getVoiceConnection } = require('@discordjs/voice');
+const { queue } = require('../resources');
 
 function checkIfUserIsInTheSameChannelOfBot (connection, voiceChannel) {
 	return (connection && voiceChannel) && connection.joinConfig.channelId === voiceChannel.id;
@@ -16,6 +17,7 @@ module.exports = {
 
 		if (checkIfUserIsInTheSameChannelOfBot(connection, voiceChannel)) {
 			connection.destroy();
+			queue.length = 0;
 			await interaction.reply(`Saindo do canal #${voiceChannel.name}`);
 		} else {
 			await interaction.reply({ content: 'Não possível executar este comando', ephemeral: true });
