@@ -1,10 +1,11 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
+const { queue } = require('../resources');
 
 module.exports = {
 	data: new SlashCommandBuilder()
-		.setName('ping')
-		.setDescription('Responde com Pong!'),
+		.setName('listqueue')
+		.setDescription('Lista as músicas na fila'),
 	async execute (interaction) {
-		await interaction.reply('Pong!');
+    interaction.reply('FILA');
 	},
 };
