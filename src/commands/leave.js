@@ -29,7 +29,7 @@ module.exports = {
 	async execute (interaction) {
 		const user = await interaction.member.fetch();
 		const voiceChannel = await user.voice.channel;
-		const connection = getVoiceConnection(voiceChannel.guild.id);
+		const connection = getVoiceConnection(voiceChannel && voiceChannel.guild.id);
 
 		if (checkIfUserIsInTheSameChannelOfBot(connection, voiceChannel)) {
 			connection.destroy();

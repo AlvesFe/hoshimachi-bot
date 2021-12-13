@@ -11,13 +11,15 @@
   "scripts": {
     "prestart": "yarn deployCommands",
     "start": "nodemon .",
-    "deployCommands": "node deploy-commands.js"
+    "deployCommands": "node deploy-commands.js",
+    "serve": "cross-env NODE_ENV=production yarn deployCommands && node ."
   },
   "dependencies": {
     "@discordjs/builders": "^0.6.0",
     "@discordjs/opus": "^0.6.0",
     "@discordjs/rest": "^0.1.0-canary.0",
     "@discordjs/voice": "^0.6.0",
+    "cross-env": "^7.0.3",
     "discord-api-types": "^0.23.1",
     "discord.js": "^13.2.0",
     "ffmpeg-static": "^4.4.0",
