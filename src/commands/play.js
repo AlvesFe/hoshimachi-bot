@@ -1,6 +1,6 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { MessageEmbed } = require('discord.js');
-const { joinVoiceChannel, createAudioPlayer, createAudioResource, AudioPlayerStatus } = require('@discordjs/voice');
+const { joinVoiceChannel, createAudioPlayer, createAudioResource, AudioPlayerStatus, getVoiceConnection } = require('@discordjs/voice');
 const yts = require('yt-search');
 const ytdl = require('ytdl-core');
 const { queue, channel } = require('../resources');
@@ -12,6 +12,12 @@ player.on(AudioPlayerStatus.Idle, async () => {
 	if (queue.length > 0) {
 		playMusic(queue[0]);
 		await channel.interaction.followUp({ embeds: [await playingMessage(channel.interaction, queue[0].search, queue[0].user)] });
+	} else {
+		player.stop();
+		setTimeout(async () => {
+			await channel.interaction.followUp({ embeds: [await leftTheChannelMessage(channel.interaction)] });
+			getVoiceConnection(channel.interaction.guildId).destroy();
+		}, 10000);
 	}
 });
 
@@ -77,6 +83,20 @@ async function addedToQueueMessage (interaction, search, user) {
 		.setThumbnail(search.thumbnail)
 		.setTimestamp()
 		.setFooter(user.nickname ?? user.user.username, userAvatarUrl);
+}
+
+async function leftTheChannelMessage (interaction) {
+	const bot = await interaction.client.users.fetch(clientId).then(res => {
+		return {
+			avatarURl: res.displayAvatarURL({ format: 'png' }),
+		};
+	});
+
+	return new MessageEmbed()
+		.setColor('#9ec2e8')
+		.setAuthor('Hoshimachi', bot.avatarURl, '')
+		.setDescription('Saindo do canal por inatividade')
+		.setTimestamp();
 }
 
 module.exports = {
