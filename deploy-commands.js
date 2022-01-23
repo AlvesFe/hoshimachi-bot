@@ -17,7 +17,7 @@ const rest = new REST({ version: '9' }).setToken(token);
 if (NODE_ENV === 'production') {
   rest
     .put(Routes.applicationCommands(clientId), { body: commands })
-    .then(() => console.log('Successfully registered application commands.'))
+    .then(() => console.log('Successfully registered global application commands.'))
     .catch(console.error);
 } else {
   rest

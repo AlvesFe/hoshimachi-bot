@@ -22,7 +22,7 @@ player.on(AudioPlayerStatus.Idle, async () => {
 });
 
 function isVideo (search) {
-	return search.type === 'video';
+	return search?.type === 'video';
 }
 
 function JoinChannel (interaction, voiceChannel) {
