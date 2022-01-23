@@ -9,13 +9,20 @@ jobs:
     runs-on: ubuntu-latest
     name: build&deploy
     steps:
-      # To use this repository's private action, you must check out the repository
       - name: Checkout
         uses: actions/checkout@v2
-      - name: Install Dependencies
-        run: yarn
 
-      - name: deploy file to server
+      - name: predeploy
+        uses: kevin-leptons/ssh_action@v1
+        with:
+          # URI refers to remote host like `user@host`
+          host: ${{ secrets.PROD_FTP_USER }}@${{ secrets.PROD_FTP_SERVER }}
+          # Private SSH key to authenticate
+          key: ${{ secrets.PROD_FTP_PWD }}
+          # Command to execute, Bash syntax
+          command: ./prepareToDeploy.sh
+
+      - name: deploy
         uses: wlixcc/SFTP-Deploy-Action@v1.0
         with:
           username: ${{ secrets.PROD_FTP_USER }}
@@ -23,3 +30,13 @@ jobs:
           ssh_private_key: ${{ secrets.PROD_FTP_PWD }}
           local_path: './*'
           remote_path: './hoshimachi-bot'
+
+      - name: posDeploy 
+        uses: kevin-leptons/ssh_action@v1
+        with:
+          # URI refers to remote host like `user@host`
+          host: ${{ secrets.PROD_FTP_USER }}@${{ secrets.PROD_FTP_SERVER }}
+          # Private SSH key to authenticate
+          key: ${{ secrets.PROD_FTP_PWD }}
+          # Command to execute, Bash syntax
+          command: ./postDeploy.sh
