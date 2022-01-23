@@ -1,0 +1,31 @@
+on:
+  pull_request:
+    branches:
+      - master
+name: Production Deployment
+jobs:
+  web-deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    steps:
+    - name: Get latest code
+      uses: actions/checkout@v2
+
+    - name: Install node packages
+      uses: actions/setup-node@v2
+      with:
+        node-version: '16'
+    - run: npm install
+    
+    - name: Sync files
+      uses: SamKirkland/FTP-Deploy-Action@4.1.0
+      with:
+        server: ${{ secrets.PROD_FTP_SERVER }}
+        username: ${{ secrets.PROD_FTP_USER }}
+        password: ${{ secrets.PROD_FTP_PWD }}
+        protocol: ftps
+        server-dir: ./hoshimachi-bot/
+        exclude: |
+          **/.git*
+          **/.git*/**
+          **/node_modules/**
