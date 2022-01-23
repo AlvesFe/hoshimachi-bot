@@ -3,29 +3,23 @@ on:
     branches:
       - master
 name: Production Deployment
-jobs:
-  web-deploy:
-    name: Deploy
-    runs-on: ubuntu-latest
-    steps:
-    - name: Get latest code
-      uses: actions/checkout@v2
 
-    - name: Install node packages
-      uses: actions/setup-node@v2
-      with:
-        node-version: '16'
-    - run: npm install
-    
-    - name: Sync files
-      uses: SamKirkland/FTP-Deploy-Action@4.1.0
-      with:
-        server: ${{ secrets.PROD_FTP_SERVER }}
-        username: ${{ secrets.PROD_FTP_USER }}
-        password: ${{ secrets.PROD_FTP_PWD }}
-        protocol: ftps
-        server-dir: ./hoshimachi-bot/
-        exclude: |
-          **/.git*
-          **/.git*/**
-          **/node_modules/**
+jobs:
+  deploy_job:
+    runs-on: ubuntu-latest
+    name: build&deploy
+    steps:
+      # To use this repository's private action, you must check out the repository
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Install Dependencies
+        run: yarn
+
+      - name: deploy file to server
+        uses: wlixcc/SFTP-Deploy-Action@v1.0
+        with:
+          username: ${{ secrets.PROD_FTP_USER }}
+          server: ${{ secrets.PROD_FTP_SERVER }}
+          ssh_private_key: ${{ secrets.PROD_FTP_PWD }}
+          local_path: './*'
+          remote_path: '/hoshimachi-bot'
