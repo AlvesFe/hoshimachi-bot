@@ -22,4 +22,4 @@ jobs:
           server: ${{ secrets.PROD_FTP_SERVER }}
           ssh_private_key: ${{ secrets.PROD_FTP_PWD }}
           local_path: './*'
-          remote_path: '~/hoshimachi-bot'
+          remote_path: './hoshimachi-bot'
