@@ -9,7 +9,7 @@
     "node": ">=16.6.0"
   },
   "scripts": {
-    "prestart": "yarn deployCommands",
+    "predev": "yarn deployCommands",
     "dev": "nodemon .",
     "deployCommands": "node deploy-commands.js",
     "start": "cross-env NODE_ENV=production yarn deployCommands && node ."
