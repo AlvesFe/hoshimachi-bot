@@ -10,9 +10,9 @@
   },
   "scripts": {
     "prestart": "yarn deployCommands",
-    "start": "nodemon .",
+    "dev": "nodemon .",
     "deployCommands": "node deploy-commands.js",
-    "serve": "cross-env NODE_ENV=production yarn deployCommands && node ."
+    "start": "cross-env NODE_ENV=production yarn deployCommands && node ."
   },
   "dependencies": {
     "@discordjs/builders": "^0.6.0",
