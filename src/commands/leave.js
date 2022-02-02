@@ -2,7 +2,7 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 const { getVoiceConnection } = require('@discordjs/voice');
 const { MessageEmbed } = require('discord.js');
 const { queue } = require('../resources');
-const { clientId } = require('../../config.json');
+const clientId = process.env.CLIENT_ID;
 
 function checkIfUserIsInTheSameChannelOfBot (connection, voiceChannel) {
 	return (connection && voiceChannel) && connection.joinConfig.channelId === voiceChannel.id;

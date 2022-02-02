@@ -5,7 +5,7 @@ const yts = require('yt-search');
 const ytdl = require('ytdl-core');
 const { queue, channel } = require('../resources');
 const player = createAudioPlayer();
-const { clientId } = require('../../config.json');
+const clientId = process.env.CLIENT_ID;
 
 player.on(AudioPlayerStatus.Idle, async () => {
 	queue.shift();
@@ -22,7 +22,7 @@ player.on(AudioPlayerStatus.Idle, async () => {
 });
 
 function isVideo (search) {
-	return search.type === 'video';
+	return search?.type === 'video';
 }
 
 function JoinChannel (interaction, voiceChannel) {
