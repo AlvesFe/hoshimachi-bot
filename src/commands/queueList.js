@@ -44,6 +44,13 @@ module.exports = {
 		.setName('listqueue')
 		.setDescription('Lista as músicas na fila'),
 	async execute (interaction) {
-		interaction.reply({ embeds: [await queueListMessage(interaction)] });
+		if (queue.length > 0) {
+			interaction.reply({ embeds: [await queueListMessage(interaction)] });
+		} else {
+			interaction.reply({
+        content: 'A fila está vazia!',
+        ephemeral: true
+      });
+		}
 	},
 };
