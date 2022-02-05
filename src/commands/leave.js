@@ -1,25 +1,16 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { getVoiceConnection } = require('@discordjs/voice');
-const { MessageEmbed } = require('discord.js');
 const { queue } = require('../resources');
-const clientId = process.env.CLIENT_ID;
+const { defaultMessage } = require('../resources/messageBuilder');
 
 function checkIfUserIsInTheSameChannelOfBot (connection, voiceChannel) {
 	return (connection && voiceChannel) && connection.joinConfig.channelId === voiceChannel.id;
 }
 
-async function leftTheChannelMessage (interaction, user, voiceChannel) {
-	const botAvatarUrl = await interaction.client.users.fetch(clientId).then(res => {
-		return res.displayAvatarURL({ format: 'png' });
-	});
-	const userAvatarUrl = user.displayAvatarURL({ format: 'png' });
-
-	return new MessageEmbed()
-		.setColor('#9ec2e8')
-		.setAuthor('Hoshimachi', botAvatarUrl, '')
-		.setDescription(`Saindo do canal <#${voiceChannel.id}>`)
-		.setTimestamp()
-		.setFooter(user.nickname ?? user.user.username, userAvatarUrl);
+async function leftTheChannelMessage (interaction, voiceChannel) {
+	const message = (await defaultMessage(interaction, 'Desconectado', true))
+		.setDescription(`Saindo do canal <#${voiceChannel.id}>`);
+	return message;
 }
 
 module.exports = {
@@ -34,7 +25,7 @@ module.exports = {
 		if (checkIfUserIsInTheSameChannelOfBot(connection, voiceChannel)) {
 			connection.destroy();
 			queue.length = 0;
-			await interaction.reply({ embeds: [await leftTheChannelMessage(interaction, user, voiceChannel)] });
+			await interaction.reply({ embeds: [await leftTheChannelMessage(interaction, voiceChannel)] });
 		} else {
 			await interaction.reply({ content: 'Não possível executar este comando', ephemeral: true });
 		}

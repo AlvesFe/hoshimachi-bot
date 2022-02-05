@@ -1,11 +1,12 @@
+// eslint-disable-next-line no-unused-vars
+const { Interaction, VoiceChannel } = require('discord.js');
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { MessageEmbed } = require('discord.js');
 const { joinVoiceChannel, createAudioPlayer, createAudioResource, AudioPlayerStatus, getVoiceConnection } = require('@discordjs/voice');
 const yts = require('yt-search');
 const ytdl = require('ytdl-core');
 const { queue, channel } = require('../resources');
+const { defaultMessage } = require('../resources/messageBuilder');
 const player = createAudioPlayer();
-const clientId = process.env.CLIENT_ID;
 
 player.on(AudioPlayerStatus.Idle, async () => {
 	queue.shift();
@@ -21,10 +22,21 @@ player.on(AudioPlayerStatus.Idle, async () => {
 	}
 });
 
+/**
+ * Verifica se o primeiro resultado retornado na busca do yt é um vídeo
+ * @param {yts.VideoSearchResult} search O Primeiro resultado retornado na busca no yt
+ * @returns {boolean} Booleano para se o retorno é um vídeo
+ */
 function isVideo (search) {
 	return search?.type === 'video';
 }
 
+/**
+ * Faz o bot se conectar no canal onde o usuário chamou o comando
+ * @param {Interaction} interaction Interaction do comando
+ * @param {VoiceChannel} voiceChannel Canal de voz que o usuário que chamou o comando está
+ * @returns {void}
+ */
 function JoinChannel (interaction, voiceChannel) {
 	const connection = joinVoiceChannel({
 		channelId: voiceChannel.id,
@@ -35,6 +47,11 @@ function JoinChannel (interaction, voiceChannel) {
 	connection.subscribe(player);
 }
 
+/**
+ * Inicia uma música no bot
+ * @param {{ search: yts.VideoSearchResult }} queueItem
+ * @returns {void}
+ */
 async function playMusic ({ search }) {
 	const stream = ytdl(search.url, {
 		filter: 'audioonly',
@@ -48,61 +65,45 @@ async function playMusic ({ search }) {
 	player.play(resource);
 }
 
-async function playingMessage (interaction, search, user) {
-	const { botAvatarUrl, botName } = await interaction.client.users.fetch(clientId).then(res => {
-		return {
-			botAvatarUrl: res.displayAvatarURL({ format: 'png' }),
-			botName: res.username
-		};
-	});
-	const userAvatarUrl = user.displayAvatarURL({ format: 'png' });
-
-	return new MessageEmbed()
-		.setColor('#9ec2e8')
-		.setTitle(search.title)
+/**
+ * Monta um embed para quando uma música começa a tocar
+ * @param {Interaction} interaction Interaction do comando
+ * @returns Mensagem montada
+ */
+async function playingMessage (interaction, search) {
+	const message = (await defaultMessage(interaction, search.title, true))
 		.setURL(search.url)
-		.setAuthor(botName, botAvatarUrl)
 		.setDescription(search.description)
 		.setThumbnail(search.thumbnail)
 		.addFields(
 			{ name: '**Autor:** ', value: search.author.name },
-		)
-		.setTimestamp()
-		.setFooter(user.nickname ?? user.user.username, userAvatarUrl);
+		);
+	return message;
 }
 
-async function addedToQueueMessage (interaction, search, user) {
-	const { botAvatarUrl, botName } = await interaction.client.users.fetch(clientId).then(res => {
-		return {
-			botAvatarUrl: res.displayAvatarURL({ format: 'png' }),
-			botName: res.username
-		};
-	});
-	const userAvatarUrl = user.displayAvatarURL({ format: 'png' });
-
-	return new MessageEmbed()
-		.setColor('#9ec2e8')
-		.setTitle(search.title)
+/**
+ * Monta um embed para quando uma música é adicionada na fila
+ * @param {Interaction} interaction Interaction do comando
+ * @returns Mensagem montada
+ */
+async function addedToQueueMessage (interaction, search) {
+	const message = (await defaultMessage(interaction, search.title, true))
 		.setURL(search.url)
-		.setAuthor(botName, botAvatarUrl)
 		.setDescription('Música adicionada a fila!')
-		.setThumbnail(search.thumbnail)
-		.setTimestamp()
-		.setFooter(user.nickname ?? user.user.username, userAvatarUrl);
+		.setThumbnail(search.thumbnail);
+	return message;
 }
 
+/**
+ * Monta um embed para quando o bot sai do canal por inatividade
+ * @param {Interaction} interaction Interaction do comando
+ * @returns Mensagem montada
+ */
 async function leftTheChannelMessage (interaction) {
-	const bot = await interaction.client.users.fetch(clientId).then(res => {
-		return {
-			avatarURl: res.displayAvatarURL({ format: 'png' }),
-		};
-	});
+	const message = (await defaultMessage(interaction, 'Desconectado'))
+		.setDescription('Saindo do canal por inatividade');
 
-	return new MessageEmbed()
-		.setColor('#9ec2e8')
-		.setAuthor('Hoshimachi', bot.avatarURl, '')
-		.setDescription('Saindo do canal por inatividade')
-		.setTimestamp();
+	return message;
 }
 
 module.exports = {
@@ -113,6 +114,11 @@ module.exports = {
 			option.setName('music')
 				.setDescription('Link ou nome da música')
 				.setRequired(true)),
+	/**
+	 * Executa o comando
+	 * @param {Interaction} interaction Interaction do comando
+	 * @returns {void}
+	 */
 	async execute (interaction) {
 		const user = await interaction.member.fetch();
 		const voiceChannel = await user.voice.channel;
@@ -127,10 +133,10 @@ module.exports = {
 		if (isVideo(search) && queue.length === 0) {
 			queue.push({ search, user });
 			await playMusic({ search });
-			await interaction.reply({ embeds: [await playingMessage(interaction, search, user)] });
+			await interaction.reply({ embeds: [await playingMessage(interaction, search)] });
 		} else if (isVideo(search) && queue.length !== 0) {
 			queue.push({ search, user });
-			await interaction.reply({ embeds: [await addedToQueueMessage(interaction, search, user)] });
+			await interaction.reply({ embeds: [await addedToQueueMessage(interaction, search)] });
 		} else {
 			await interaction.reply('Música não encontrada');
 		}
