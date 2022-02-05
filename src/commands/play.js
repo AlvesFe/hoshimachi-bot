@@ -49,8 +49,11 @@ async function playMusic ({ search }) {
 }
 
 async function playingMessage (interaction, search, user) {
-	const botAvatarUrl = await interaction.client.users.fetch(clientId).then(res => {
-		return res.displayAvatarURL({ format: 'png' });
+	const { botAvatarUrl, botName } = await interaction.client.users.fetch(clientId).then(res => {
+		return {
+			botAvatarUrl: res.displayAvatarURL({ format: 'png' }),
+			botName: res.username
+		};
 	});
 	const userAvatarUrl = user.displayAvatarURL({ format: 'png' });
 
@@ -58,19 +61,22 @@ async function playingMessage (interaction, search, user) {
 		.setColor('#9ec2e8')
 		.setTitle(search.title)
 		.setURL(search.url)
-		.setAuthor('Hoshimachi', botAvatarUrl, '')
+		.setAuthor(botName, botAvatarUrl)
 		.setDescription(search.description)
 		.setThumbnail(search.thumbnail)
 		.addFields(
-			{ name: 'Autor', value: search.author.name },
+			{ name: '**Autor:** ', value: search.author.name },
 		)
 		.setTimestamp()
 		.setFooter(user.nickname ?? user.user.username, userAvatarUrl);
 }
 
 async function addedToQueueMessage (interaction, search, user) {
-	const botAvatarUrl = await interaction.client.users.fetch(clientId).then(res => {
-		return res.displayAvatarURL({ format: 'png' });
+	const { botAvatarUrl, botName } = await interaction.client.users.fetch(clientId).then(res => {
+		return {
+			botAvatarUrl: res.displayAvatarURL({ format: 'png' }),
+			botName: res.username
+		};
 	});
 	const userAvatarUrl = user.displayAvatarURL({ format: 'png' });
 
@@ -78,7 +84,7 @@ async function addedToQueueMessage (interaction, search, user) {
 		.setColor('#9ec2e8')
 		.setTitle(search.title)
 		.setURL(search.url)
-		.setAuthor('Hoshimachi', botAvatarUrl, '')
+		.setAuthor(botName, botAvatarUrl)
 		.setDescription('Música adicionada a fila!')
 		.setThumbnail(search.thumbnail)
 		.setTimestamp()
