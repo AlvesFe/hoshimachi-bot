@@ -1,34 +1,29 @@
+// eslint-disable-next-line no-unused-vars
+const { VideoSearchResult } = require('yt-search');
+// eslint-disable-next-line no-unused-vars
+const { Interaction } = require('discord.js');
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { queue } = require('../resources');
-const { MessageEmbed, Interaction, User } = require('discord.js');
-const clientId = process.env.CLIENT_ID;
+const { defaultMessage } = require('../resources/messageBuilder');
 
 /**
- * Lista a fila
- * @param {Interaction} interaction
- * @param {User} user
+ * Monta um embed com todas as músicas da fila
+ * @param {Interaction} interaction Interaction do comando
+ * @returns Mensagem montada
  */
 async function queueListMessage (interaction) {
 	const server = interaction.guild.name;
-	const { botAvatarUrl, botName } = await interaction.client.users.fetch(clientId).then(res => {
-		return {
-			botAvatarUrl: res.displayAvatarURL({ format: 'png' }),
-			botName: res.username
-		};
-	});
-	const user = await interaction.member.fetch();
-	const userAvatarUrl = user.displayAvatarURL({ format: 'png' });
-
-	return new MessageEmbed()
-		.setColor('#9ec2e8')
-		.setTitle('Fila de músicas')
-		.setAuthor(botName, botAvatarUrl)
-		.setDescription(`*Servidor: **${server}***`)
-		.addFields(queueFieldsBuilder(queue))
-		.setTimestamp()
-		.setFooter(user.nickname ?? user.user.username, userAvatarUrl);
+	const message = (await defaultMessage(interaction, 'Fila de músicas', true))
+			.setDescription(`*Servidor: **${server}***`)
+			.addFields(queueFieldsBuilder(queue));
+	return message;
 }
 
+/**
+ * Cria uma array de objetos com todas as entradas da fila
+ * @param {{search: VideoSearchResult}[]} fila fila de músicas
+ * @returns A array com itens da fila com nome da música e autor do vídeo
+ */
 function queueFieldsBuilder (fila) {
 	const fields = fila.map(({ search }, i) => {
 		return {
@@ -48,9 +43,9 @@ module.exports = {
 			interaction.reply({ embeds: [await queueListMessage(interaction)] });
 		} else {
 			interaction.reply({
-        content: 'A fila está vazia!',
-        ephemeral: true
-      });
+				content: 'A fila está vazia!',
+				ephemeral: true
+			});
 		}
 	},
 };
