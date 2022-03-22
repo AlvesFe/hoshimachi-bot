@@ -50,7 +50,7 @@ function JoinChannel (interaction, voiceChannel) {
 /**
  * Inicia uma música no bot
  * @param {{ search: yts.VideoSearchResult }} queueItem
- * @returns {void}
+ * @returns {Promise<void>}
  */
 async function playMusic ({ search }) {
 	const stream = ytdl(search.url, {
@@ -81,6 +81,33 @@ async function playingMessage (interaction, search) {
 	return message;
 }
 
+async function playlistMessage (interaction, title, thumbnail, playlist) {
+	const fields = [];
+
+	const loopLength = playlist.length > 5 ? 5 : playlist.length;
+	for (let i = 0; i < loopLength; i++) {
+		fields.push({
+			name: playlist[i].search.title,
+			value: `\` ${i + 1} \` • ${playlist[i].search.author.name} • ${playlist[i].search.duration.timestamp}`
+		});
+	}
+
+	loopLength > 5 && fields.push({
+		name: `...e mais ${playlist.length - loopLength} músicas!`,
+		value: '\u200b'
+	});
+
+	const message = (await defaultMessage(
+		interaction,
+		`Playlist ${title} adicionada à fila`,
+		true
+	)).setDescription('Adicionando...')
+		.setThumbnail(thumbnail)
+		.addFields([...fields]);
+
+	return message;
+}
+
 /**
  * Monta um embed para quando uma música é adicionada na fila
  * @param {Interaction} interaction Interaction do comando
@@ -106,6 +133,32 @@ async function leftTheChannelMessage (interaction) {
 	return message;
 }
 
+function formatMusicString (search) {
+	try {
+		const url = new URL(search);
+
+		const urlParams = new URLSearchParams(url.search);
+		const listId = urlParams.get('list');
+
+		return (listId ? { listId } : { query: search });
+	} catch {
+		return { query: search };
+	}
+}
+
+function formatPlaylist (playlist, user) {
+	return playlist.videos.map((video, index) => {
+		return {
+			search: {
+				...video,
+				url: video.url ?? `https://youtube.com/watch?v=${video.videoId}`,
+				description: `Música ${index + 1} da playlist ${playlist.title}`
+			},
+			user
+		};
+	});
+}
+
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('play')
@@ -122,23 +175,31 @@ module.exports = {
 	async execute (interaction) {
 		const user = await interaction.member.fetch();
 		const voiceChannel = await user.voice.channel;
-		const search = (await yts(interaction.options.getString('music'))).all[0];
 
 		if (!voiceChannel) {
 			return await interaction.reply('Você precisa estar em um canal de voz para executar esse comando');
 		}
+		const musicStrings = formatMusicString(interaction.options.getString('music'));
+		const response = await yts(musicStrings);
+
+		if (!response.all) {
+			const playlist = formatPlaylist(response, user);
+			JoinChannel(interaction, voiceChannel);
+			if (queue.length === 0) await playMusic({ search: playlist[0].search });
+			queue.push(...playlist);
+			return await interaction.reply({ embeds: [await playlistMessage(interaction, response.title, response.thumbnail, playlist)] });
+		}
+
+		const search = response.all[0];
+		if (!isVideo(search)) return await interaction.reply('Música não encontrada');
 
 		JoinChannel(interaction, voiceChannel);
+		if (queue.length === 0) await playMusic({ search });
+		queue.push({ search, user });
+		const embeds = queue.length === 0
+		? playingMessage(interaction, search)
+		: addedToQueueMessage(interaction, search);
 
-		if (isVideo(search) && queue.length === 0) {
-			queue.push({ search, user });
-			await playMusic({ search });
-			await interaction.reply({ embeds: [await playingMessage(interaction, search)] });
-		} else if (isVideo(search) && queue.length !== 0) {
-			queue.push({ search, user });
-			await interaction.reply({ embeds: [await addedToQueueMessage(interaction, search)] });
-		} else {
-			await interaction.reply('Música não encontrada');
-		}
+		await interaction.reply({ embeds: [await embeds] });
 	}
 };
