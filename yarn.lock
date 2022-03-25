@@ -686,10 +686,10 @@ d@1, d@^1.0.1:
     es5-ext "^0.10.50"
     type "^1.0.1"
 
-dasu@~0.4.2:
-  version "0.4.2"
-  resolved "https://registry.yarnpkg.com/dasu/-/dasu-0.4.2.tgz#2290ebf08d4a70ff2ada924b7a01be24b5215a01"
-  integrity sha512-3iZKDAKqv0APFwpqP40gpro5msM+pwhQN7IhB42mjbL1W4M2V6A+MJy7RhA8y6lUM+1mQoLls3OePidmzVbncQ==
+dasu@~0.4.3:
+  version "0.4.3"
+  resolved "https://registry.yarnpkg.com/dasu/-/dasu-0.4.3.tgz#892ecaa66ab69b1f21d9ca016699dbd0aec7e359"
+  integrity sha512-AFwspl5k7V8MW8H7tyIGJ0gtOauUg7JC+DgiRFUIXvPNNDFXTMtvnCkZY0macN6JLGqBjNP38WVnQN7Iv3RSlg==
 
 debug@4, debug@^4.0.1, debug@^4.1.1:
   version "4.3.2"
@@ -2378,15 +2378,15 @@ yallist@^4.0.0:
   resolved "https://registry.yarnpkg.com/yallist/-/yallist-4.0.0.tgz#9bb92790d9c0effec63be73519e11a35019a3a72"
   integrity sha512-3wdGidZyq5PB084XLES5TpOSRA3wjXAlIWMhum2kRcv/41Sn2emQ0dycQW4uZXLejwKvg6EsvbdlVL+FYEct7A==
 
-yt-search@^2.10.1:
-  version "2.10.1"
-  resolved "https://registry.yarnpkg.com/yt-search/-/yt-search-2.10.1.tgz#971c2b4675e31ed503218e101583d0995c435589"
-  integrity sha512-7xORFvQMkzkVVOsRVV6qW+Ld8FIl8OQcN3ThsDf04jwr2GyR4miGmC98IA2X/gjTWUEj2SRhmzw6kApj3LHdsQ==
+yt-search@^2.10.3:
+  version "2.10.3"
+  resolved "https://registry.yarnpkg.com/yt-search/-/yt-search-2.10.3.tgz#c90db45e4a960f06ef1bfe7ba13457790ded661e"
+  integrity sha512-msITxMhn+1f3RIlS2R0d5/275grX0nUgaD570Fap3gvPmwfvR9w31JG8B9++4Xtm6BLAzhdITK7kAWRInef8QQ==
   dependencies:
     async.parallellimit "~0.5.2"
     boolstring "~1.0.2"
     cheerio "^1.0.0-rc.10"
-    dasu "~0.4.2"
+    dasu "~0.4.3"
     human-time "0.0.2"
     jsonpath-plus "~5.0.2"
     minimist "~1.2.5"
