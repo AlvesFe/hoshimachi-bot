@@ -31,7 +31,7 @@ function queueFieldsBuilder (fila) {
 			value: `**Autor:** ${search.author.name}`
 		}
 	})
-	return fields
+	return fields.slice(0, 25)
 }
 
 module.exports = {
