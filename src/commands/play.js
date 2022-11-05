@@ -16,8 +16,10 @@ player.on(AudioPlayerStatus.Idle, async () => {
 	} else {
 		player.stop();
 		setTimeout(async () => {
-			await channel.interaction.followUp({ embeds: [await leftTheChannelMessage(channel.interaction)] });
-			getVoiceConnection(channel.interaction.guildId).destroy();
+			if (queue.length === 0) {
+				await channel.interaction.followUp({ embeds: [await leftTheChannelMessage(channel.interaction)] });
+				getVoiceConnection(channel.interaction.guildId).destroy();
+			}
 		}, 10000);
 	}
 });
