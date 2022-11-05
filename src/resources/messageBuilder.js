@@ -22,7 +22,7 @@ async function defaultMessage (interaction, title, footer = false) {
   const userAvatarUrl = user.displayAvatarURL({ format: 'png' })
 
   const message = new EmbedBuilder()
-    .setColor('#9ec2e8')
+    .setColor(process.env.BOT_COLOR || '#000000')
     .setTitle(title)
     .setAuthor({
       name: botName,
