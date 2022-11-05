@@ -1,6 +1,6 @@
 // eslint-disable-next-line no-unused-vars
-const { MessageEmbed, Interaction, User } = require('discord.js');
-const clientId = process.env.CLIENT_ID;
+const { MessageEmbed, Interaction, User } = require('discord.js')
+const clientId = process.env.CLIENT_ID
 
 /**
  * Monta o básico de um embed
@@ -15,26 +15,26 @@ async function defaultMessage (interaction, title, footer = false) {
     return {
       botAvatarUrl: res.displayAvatarURL({ format: 'png' }),
       botName: res.username
-    };
-  });
+    }
+  })
   /** @type {User} */
-  const user = await interaction.member.fetch();
-  const userAvatarUrl = user.displayAvatarURL({ format: 'png' });
+  const user = await interaction.member.fetch()
+  const userAvatarUrl = user.displayAvatarURL({ format: 'png' })
 
   const message = new MessageEmbed()
     .setColor('#9ec2e8')
     .setTitle(title)
     .setAuthor(botName, botAvatarUrl)
-    .setTimestamp();
+    .setTimestamp()
 
   if (footer) {
     message
-      .setFooter(user.nickname ?? user.user.username, userAvatarUrl);
+      .setFooter(user.nickname ?? user.user.username, userAvatarUrl)
   }
 
-  return message;
+  return message
 }
 
 module.exports = {
   defaultMessage
-};
+}

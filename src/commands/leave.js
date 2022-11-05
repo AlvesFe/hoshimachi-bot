@@ -1,18 +1,18 @@
 // eslint-disable-next-line no-unused-vars
-const { Interaction, User, VoiceChannel } = require('discord.js');
-const { SlashCommandBuilder } = require('@discordjs/builders');
-const { getVoiceConnection } = require('@discordjs/voice');
-const { queue } = require('../resources');
-const { defaultMessage } = require('../resources/messageBuilder');
+const { Interaction, User, VoiceChannel } = require('discord.js')
+const { SlashCommandBuilder } = require('@discordjs/builders')
+const { getVoiceConnection } = require('@discordjs/voice')
+const { queue } = require('../resources')
+const { defaultMessage } = require('../resources/messageBuilder')
 
 function checkIfUserIsInTheSameChannelOfBot (connection, voiceChannel) {
-	return (connection && voiceChannel) && connection.joinConfig.channelId === voiceChannel.id;
+	return (connection && voiceChannel) && connection.joinConfig.channelId === voiceChannel.id
 }
 
 async function leftTheChannelMessage (interaction, voiceChannel) {
 	const message = (await defaultMessage(interaction, 'Desconectado', true))
-		.setDescription(`Saindo do canal <#${voiceChannel.id}>`);
-	return message;
+		.setDescription(`Saindo do canal <#${voiceChannel.id}>`)
+	return message
 }
 
 module.exports = {
@@ -26,17 +26,17 @@ module.exports = {
 	 */
 	async execute (interaction) {
 		/** @type {User} */
-		const user = await interaction.member.fetch();
+		const user = await interaction.member.fetch()
 		/** @type {VoiceChannel} */
-		const voiceChannel = await user.voice.channel;
-		const connection = getVoiceConnection(voiceChannel && voiceChannel.guild.id);
+		const voiceChannel = await user.voice.channel
+		const connection = getVoiceConnection(voiceChannel && voiceChannel.guild.id)
 
 		if (checkIfUserIsInTheSameChannelOfBot(connection, voiceChannel)) {
-			connection.destroy();
-			queue.length = 0;
-			await interaction.reply({ embeds: [await leftTheChannelMessage(interaction, voiceChannel)] });
+			connection.destroy()
+			queue.length = 0
+			await interaction.reply({ embeds: [await leftTheChannelMessage(interaction, voiceChannel)] })
 		} else {
-			await interaction.reply({ content: 'Não possível executar este comando', ephemeral: true });
+			await interaction.reply({ content: 'Não possível executar este comando', ephemeral: true })
 		}
-	},
-};
+	}
+}

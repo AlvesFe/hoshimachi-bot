@@ -1,11 +1,11 @@
 // eslint-disable-next-line no-unused-vars
-const { Interaction, User, VoiceChannel } = require('discord.js');
+const { Interaction, User, VoiceChannel } = require('discord.js')
 // eslint-disable-next-line no-unused-vars
-const { getVoiceConnection, AudioPlayer } = require('@discordjs/voice');
-const { SlashCommandBuilder } = require('@discordjs/builders');
+const { getVoiceConnection, AudioPlayer } = require('@discordjs/voice')
+const { SlashCommandBuilder } = require('@discordjs/builders')
 
 function checkIfUserIsInTheSameChannelOfBot (connection, voiceChannel) {
-	return (connection && voiceChannel) && connection.joinConfig.channelId === voiceChannel.id;
+	return (connection && voiceChannel) && connection.joinConfig.channelId === voiceChannel.id
 }
 
 module.exports = {
@@ -19,17 +19,17 @@ module.exports = {
    */
   async execute (interaction) {
     /** @type {User} */
-		const user = await interaction.member.fetch();
+		const user = await interaction.member.fetch()
 		/** @type {VoiceChannel} */
-		const voiceChannel = await user.voice.channel;
-		const connection = getVoiceConnection(voiceChannel && voiceChannel.guild.id);
+		const voiceChannel = await user.voice.channel
+		const connection = getVoiceConnection(voiceChannel && voiceChannel.guild.id)
     /** @type {AudioPlayer} */
-    const player = connection?.state?.subscription?.player;
+    const player = connection?.state?.subscription?.player
     if (checkIfUserIsInTheSameChannelOfBot(connection, voiceChannel) && player) {
-      player.stop();
-      await interaction.reply('Música pulada');
+      player.stop()
+      await interaction.reply('Música pulada')
 		} else {
-			await interaction.reply({ content: 'Não possível executar este comando', ephemeral: true });
+			await interaction.reply({ content: 'Não possível executar este comando', ephemeral: true })
 		}
   }
-};
+}

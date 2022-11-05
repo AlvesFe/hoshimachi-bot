@@ -1,28 +1,28 @@
 // eslint-disable-next-line no-unused-vars
-const { Interaction, VoiceChannel } = require('discord.js');
-const { SlashCommandBuilder } = require('@discordjs/builders');
-const { joinVoiceChannel, createAudioPlayer, createAudioResource, AudioPlayerStatus, getVoiceConnection } = require('@discordjs/voice');
-const yts = require('yt-search');
-const ytdl = require('ytdl-core');
-const { queue, channel } = require('../resources');
-const { defaultMessage } = require('../resources/messageBuilder');
-const player = createAudioPlayer();
+const { Interaction, VoiceChannel } = require('discord.js')
+const { SlashCommandBuilder } = require('@discordjs/builders')
+const { joinVoiceChannel, createAudioPlayer, createAudioResource, AudioPlayerStatus, getVoiceConnection } = require('@discordjs/voice')
+const yts = require('yt-search')
+const ytdl = require('ytdl-core')
+const { queue, channel } = require('../resources')
+const { defaultMessage } = require('../resources/messageBuilder')
+const player = createAudioPlayer()
 
 player.on(AudioPlayerStatus.Idle, async () => {
-	queue.shift();
+	queue.shift()
 	if (queue.length > 0) {
-		playMusic(queue[0]);
-		await channel.interaction.followUp({ embeds: [await playingMessage(channel.interaction, queue[0].search, queue[0].user)] });
+		playMusic(queue[0])
+		await channel.interaction.followUp({ embeds: [await playingMessage(channel.interaction, queue[0].search, queue[0].user)] })
 	} else {
-		player.stop();
+		player.stop()
 		setTimeout(async () => {
 			if (queue.length === 0) {
-				await channel.interaction.followUp({ embeds: [await leftTheChannelMessage(channel.interaction)] });
-				getVoiceConnection(channel.interaction.guildId).destroy();
+				await channel.interaction.followUp({ embeds: [await leftTheChannelMessage(channel.interaction)] })
+				getVoiceConnection(channel.interaction.guildId).destroy()
 			}
-		}, 10000);
+		}, 10000)
 	}
-});
+})
 
 /**
  * Verifica se o primeiro resultado retornado na busca do yt é um vídeo
@@ -30,7 +30,7 @@ player.on(AudioPlayerStatus.Idle, async () => {
  * @returns {boolean} Booleano para se o retorno é um vídeo
  */
 function isVideo (search) {
-	return search?.type === 'video';
+	return search?.type === 'video'
 }
 
 /**
@@ -44,9 +44,9 @@ function JoinChannel (interaction, voiceChannel) {
 		channelId: voiceChannel.id,
 		guildId: voiceChannel.guild.id,
 		adapterCreator: interaction.member.guild.voiceAdapterCreator
-	});
-	channel.interaction = interaction;
-	connection.subscribe(player);
+	})
+	channel.interaction = interaction
+	connection.subscribe(player)
 }
 
 /**
@@ -60,11 +60,11 @@ async function playMusic ({ search }) {
 		format: 'ogg',
 		highWaterMark: 1048576 * 32
 	}).on('error', (e) => {
-		console.error(e);
-	});
+		console.error(e)
+	})
 
-	const resource = createAudioResource(stream, { seek: 0, volume: 1 });
-	player.play(resource);
+	const resource = createAudioResource(stream, { seek: 0, volume: 1 })
+	player.play(resource)
 }
 
 /**
@@ -78,26 +78,26 @@ async function playingMessage (interaction, search) {
 		.setDescription(search.description)
 		.setThumbnail(search.thumbnail)
 		.addFields(
-			{ name: '**Autor:** ', value: search.author.name },
-		);
-	return message;
+			{ name: '**Autor:** ', value: search.author.name }
+		)
+	return message
 }
 
 async function playlistMessage (interaction, title, thumbnail, playlist) {
-	const fields = [];
+	const fields = []
 
-	const loopLength = playlist.length > 5 ? 5 : playlist.length;
+	const loopLength = playlist.length > 5 ? 5 : playlist.length
 	for (let i = 0; i < loopLength; i++) {
 		fields.push({
 			name: playlist[i].search.title,
 			value: `\` ${i + 1} \` • ${playlist[i].search.author.name} • ${playlist[i].search.duration.timestamp}`
-		});
+		})
 	}
 
 	loopLength > 5 && fields.push({
 		name: `...e mais ${playlist.length - loopLength} músicas!`,
 		value: '\u200b'
-	});
+	})
 
 	const message = (await defaultMessage(
 		interaction,
@@ -105,9 +105,9 @@ async function playlistMessage (interaction, title, thumbnail, playlist) {
 		true
 	)).setDescription('Adicionando...')
 		.setThumbnail(thumbnail)
-		.addFields([...fields]);
+		.addFields([...fields])
 
-	return message;
+	return message
 }
 
 /**
@@ -119,8 +119,8 @@ async function addedToQueueMessage (interaction, search) {
 	const message = (await defaultMessage(interaction, search.title, true))
 		.setURL(search.url)
 		.setDescription('Música adicionada a fila!')
-		.setThumbnail(search.thumbnail);
-	return message;
+		.setThumbnail(search.thumbnail)
+	return message
 }
 
 /**
@@ -130,21 +130,21 @@ async function addedToQueueMessage (interaction, search) {
  */
 async function leftTheChannelMessage (interaction) {
 	const message = (await defaultMessage(interaction, 'Desconectado'))
-		.setDescription('Saindo do canal por inatividade');
+		.setDescription('Saindo do canal por inatividade')
 
-	return message;
+	return message
 }
 
 function formatMusicString (search) {
 	try {
-		const url = new URL(search);
+		const url = new URL(search)
 
-		const urlParams = new URLSearchParams(url.search);
-		const listId = urlParams.get('list');
+		const urlParams = new URLSearchParams(url.search)
+		const listId = urlParams.get('list')
 
-		return (listId ? { listId } : { query: search });
+		return (listId ? { listId } : { query: search })
 	} catch {
-		return { query: search };
+		return { query: search }
 	}
 }
 
@@ -157,8 +157,8 @@ function formatPlaylist (playlist, user) {
 				description: `Música ${index + 1} da playlist ${playlist.title}`
 			},
 			user
-		};
-	});
+		}
+	})
 }
 
 module.exports = {
@@ -175,33 +175,33 @@ module.exports = {
 	 * @returns {void}
 	 */
 	async execute (interaction) {
-		const user = await interaction.member.fetch();
-		const voiceChannel = await user.voice.channel;
+		const user = await interaction.member.fetch()
+		const voiceChannel = await user.voice.channel
 
 		if (!voiceChannel) {
-			return await interaction.reply('Você precisa estar em um canal de voz para executar esse comando');
+			return await interaction.reply('Você precisa estar em um canal de voz para executar esse comando')
 		}
-		const musicStrings = formatMusicString(interaction.options.getString('music'));
-		const response = await yts(musicStrings);
+		const musicStrings = formatMusicString(interaction.options.getString('music'))
+		const response = await yts(musicStrings)
 
 		if (!response.all) {
-			const playlist = formatPlaylist(response, user);
-			JoinChannel(interaction, voiceChannel);
-			if (queue.length === 0) await playMusic({ search: playlist[0].search });
-			queue.push(...playlist);
-			return await interaction.reply({ embeds: [await playlistMessage(interaction, response.title, response.thumbnail, playlist)] });
+			const playlist = formatPlaylist(response, user)
+			JoinChannel(interaction, voiceChannel)
+			if (queue.length === 0) await playMusic({ search: playlist[0].search })
+			queue.push(...playlist)
+			return await interaction.reply({ embeds: [await playlistMessage(interaction, response.title, response.thumbnail, playlist)] })
 		}
 
-		const search = response.all[0];
-		if (!isVideo(search)) return await interaction.reply('Música não encontrada');
+		const search = response.all[0]
+		if (!isVideo(search)) return await interaction.reply('Música não encontrada')
 
-		JoinChannel(interaction, voiceChannel);
-		if (queue.length === 0) await playMusic({ search });
-		queue.push({ search, user });
+		JoinChannel(interaction, voiceChannel)
+		if (queue.length === 0) await playMusic({ search })
+		queue.push({ search, user })
 		const embeds = queue.length === 0
 		? playingMessage(interaction, search)
-		: addedToQueueMessage(interaction, search);
+		: addedToQueueMessage(interaction, search)
 
-		await interaction.reply({ embeds: [await embeds] });
+		await interaction.reply({ embeds: [await embeds] })
 	}
-};
+}

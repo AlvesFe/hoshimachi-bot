@@ -1,10 +1,10 @@
 // eslint-disable-next-line no-unused-vars
-const { VideoSearchResult } = require('yt-search');
+const { VideoSearchResult } = require('yt-search')
 // eslint-disable-next-line no-unused-vars
-const { Interaction } = require('discord.js');
-const { SlashCommandBuilder } = require('@discordjs/builders');
-const { queue } = require('../resources');
-const { defaultMessage } = require('../resources/messageBuilder');
+const { Interaction } = require('discord.js')
+const { SlashCommandBuilder } = require('@discordjs/builders')
+const { queue } = require('../resources')
+const { defaultMessage } = require('../resources/messageBuilder')
 
 /**
  * Monta um embed com todas as músicas da fila
@@ -12,11 +12,11 @@ const { defaultMessage } = require('../resources/messageBuilder');
  * @returns Mensagem montada
  */
 async function queueListMessage (interaction) {
-	const server = interaction.guild.name;
+	const server = interaction.guild.name
 	const message = (await defaultMessage(interaction, 'Fila de músicas', true))
 			.setDescription(`*Servidor: **${server}***`)
-			.addFields(queueFieldsBuilder(queue));
-	return message;
+			.addFields(queueFieldsBuilder(queue))
+	return message
 }
 
 /**
@@ -29,9 +29,9 @@ function queueFieldsBuilder (fila) {
 		return {
 			name: `#${i + 1} - ${search.title}`,
 			value: `**Autor:** ${search.author.name}`
-		};
-	});
-	return fields;
+		}
+	})
+	return fields
 }
 
 module.exports = {
@@ -40,12 +40,12 @@ module.exports = {
 		.setDescription('Lista as músicas na fila'),
 	async execute (interaction) {
 		if (queue.length > 0) {
-			interaction.reply({ embeds: [await queueListMessage(interaction)] });
+			interaction.reply({ embeds: [await queueListMessage(interaction)] })
 		} else {
 			interaction.reply({
 				content: 'A fila está vazia!',
 				ephemeral: true
-			});
+			})
 		}
-	},
-};
+	}
+}
